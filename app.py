@@ -18,6 +18,8 @@ CORS(app)  # Enable CORS for frontend communication
 # Configuration
 OPENWEATHER_API_KEY = os.getenv('OPENWEATHER_API_KEY')
 OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather'
+UNSPLASH_ACCESS_KEY = os.getenv('UNSPLASH_ACCESS_KEY')
+UNSPLASH_BASE_URL = 'https://api.unsplash.com/search/photos'
 
 
 # Outfit recommendation logic
@@ -133,6 +135,66 @@ def generate_style_tips(temp, condition, mood):
     return ' | '.join(tips) if tips else "Dress comfortably and confidently!"
 
 
+def search_unsplash_image(query, orientation='portrait'):
+    """
+    Search Unsplash for outfit-related images
+    Returns image URL or None if not found
+    """
+    if not UNSPLASH_ACCESS_KEY:
+        return None
+    
+    try:
+        params = {
+            'query': query,
+            'per_page': 1,
+            'orientation': orientation,
+            'content_filter': 'high'
+        }
+        headers = {
+            'Authorization': f'Client-ID {UNSPLASH_ACCESS_KEY}'
+        }
+        
+        response = requests.get(UNSPLASH_BASE_URL, params=params, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            if data['results']:
+                return {
+                    'url': data['results'][0]['urls']['regular'],
+                    'thumb': data['results'][0]['urls']['small'],
+                    'photographer': data['results'][0]['user']['name'],
+                    'photographer_url': data['results'][0]['user']['links']['html']
+                }
+        return None
+    except Exception as e:
+        print(f"Unsplash API error: {str(e)}")
+        return None
+
+
+def get_outfit_images(outfit):
+    """
+    Fetch Unsplash images for each outfit component
+    """
+    images = {}
+    
+    # Search queries for each outfit piece
+    search_queries = {
+        'top': f"{outfit['top']} fashion flatlay",
+        'bottom': f"{outfit['bottom']} fashion flatlay",
+        'outerwear': f"{outfit['outerwear']} fashion flatlay" if outfit['outerwear'] and outfit['outerwear'] != 'None needed' else None,
+        'footwear': f"{outfit['footwear']} fashion flatlay",
+        'outfit_complete': f"complete outfit flatlay fashion minimal aesthetic"
+    }
+    
+    for key, query in search_queries.items():
+        if query:
+            image_data = search_unsplash_image(query)
+            if image_data:
+                images[key] = image_data
+    
+    return images
+
+
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
@@ -193,11 +255,15 @@ def outfit_recommendation():
         # Generate outfit recommendation
         recommendation = get_outfit_recommendation(weather_data, preferences)
         
+        # Fetch outfit images from Unsplash
+        outfit_images = get_outfit_images(recommendation['outfit'])
+        
         # Combine response
         response = {
             'location': location,
             'weather': weather_info,
             'outfit': recommendation['outfit'],
+            'outfit_images': outfit_images,
             'color_palette': recommendation['color_palette'],
             'style_tips': recommendation['style_tips']
         }
