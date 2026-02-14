@@ -1,0 +1,18 @@
+I used Claude for the first time to brainstorm the features of my project, and create the frontend and backend of my project. These are some of the main prompts I used with Claude:
+
+I would like to make a web service where based on the current weather and the user's inputted preferences/mood and current taste, the service will recommend and suggest an outfit and accessories in an aesthetic format. I would like the website to connect to a python service on render.com that uses the openweather API, so that I have a backend service as well. Please show me what the python code looks like for the backend as well as the html code for the frontend and explain the clean communication between the two.
+
+To ensure my env file isn't pushed to github, I need a gitignore file right? What would I put in the gitignore file
+
+I can see the frontend now on my browser. However there seems to be some issues with the algorithm because no mater what I type for the location, it says Unable to fetch weather data. Please check the location issue.
+
+Additionally, when I checked the openweather API key directly in the browser, it said it was an invalid API key. Do you think I just have to wait a couple of hours before the API key is actually activated?
+
+Great, the website works now. However, to address the aesthetics, can you make the color palette something related to a beige, minimalistic, modern, clean, fashionable vibe? Also, when giving outfit recommendations, can you include images of these recommendations, in a layout that is similar to the images I attached -- I want something where the clothes are laid out in a presentable and aesthetic manner so people can easily see and take inspiration. Are there any other external things/sources we need for you to be able to extract these types of images and display? Let me know if you have any clarifying questions before you begin
+
+Is there some sort of AI image generation API that is accurate and realistic that does not involve paying money? If not, I'm leaning towards Option B to get real product photos.
+
+
+
+
+
